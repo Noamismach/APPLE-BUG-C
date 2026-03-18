@@ -1,0 +1,11 @@
+name: Mac Ping Test
+on: [push, workflow_dispatch]
+jobs:
+  ping:
+    runs-on: macos-latest
+    steps:
+      - name: System Info
+        run: |
+          echo "We are in!"
+          sw_vers
+          python3 --version
