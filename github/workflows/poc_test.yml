@@ -1,0 +1,26 @@
+name: CoreML UAF PoC Trigger
+on: [push, workflow_dispatch]
+jobs:
+  run-poc:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: pip install coremltools numpy
+      - name: Run PoC with Malloc Debugging
+        env:
+          MallocNanoZone: 0
+          MallocScribble: 1
+          MallocGuardEdges: 1
+          MallocStackLogging: 1
+        run: |
+          python uaf_convertArrayValueToPython_poc.py || true
+      - name: Fetch macOS Crash Reports
+        run: |
+          echo "Looking for crash reports..."
+          ls -la ~/Library/Logs/DiagnosticReports/ || true
+          cat ~/Library/Logs/DiagnosticReports/*.crash || true
